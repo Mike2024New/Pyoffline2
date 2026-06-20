@@ -1,0 +1,58 @@
+# файлы с моделями и прочими ресурсами (это скинуть в релиз)
+resources/
+releases/
+release/
+python_embed/
+python/
+logs/
+
+# тесты
+.pytest_cache/
+
+# Виртуальное окружение
+.venv/
+venv/
+env/
+
+# PyCharm
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+*.spec
+
+# uv
+uv.lock
+
+# Чувствительные данные
+.env
+*.env
+settings.local.json
+secrets/
+*.key
+*.pem
+
+# мои заметки
+todo.txt
+
+# промежуточные файлы
+helper*.py
+
+# Системные файлы Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Системные файлы Linux
+.directory
+*~
+
+# Системные файлы macOS
+.DS_Store
+.AppleDouble
