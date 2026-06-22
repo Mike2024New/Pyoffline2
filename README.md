@@ -165,7 +165,7 @@ PyOffline2 не конкурирует с `uv`, `pip` и другими инст
 # 1. Скачать репозиторий:
 git clone https://github.com/Mike2024New/pyoffline2.git
 # 2. Перейти в папку с архивом:
-cd pyoffline2
+cd Pyoffline2
 # 3. Создать venv (! Папка должна называться .venv, минимальная версия 3.12)
 python -m venv .venv
 # 4. Активировать виртуальное окружение:
@@ -185,7 +185,7 @@ python cli.py build
 # 1. Скачать репозиторий:
 git clone https://github.com/Mike2024New/pyoffline2.git
 # 2. Перейти в папку с архивом:
-cd pyoffline2
+cd Pyoffline2
 # 3. Создать venv (! Папка должна называться .venv, минимальная версия 3.12)
 python3 -m venv .venv
 # 4. Активировать виртуальное окружение:
