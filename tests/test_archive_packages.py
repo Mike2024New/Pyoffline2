@@ -44,5 +44,5 @@ def test_download_package_2(main):
 
 def test_download_package_3(main):
     packages_list = ['no_exists_package_no_correct_name_@@@@_no_such_exists']
-    with pytest.raises(AssertionError):
+    with pytest.raises(RuntimeError):
         load_packages(packages_list=packages_list)

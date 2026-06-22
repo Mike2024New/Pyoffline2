@@ -22,7 +22,6 @@ def main(tmp_path_factory):
 def test_download_package_1(main):
     python_exe_paths = python_fn.get_archive_python_executables()
     python_versions = [python_fn.get_python_version(exe) for exe in python_exe_paths]
-
     assert len(python_versions) > 0, 'Для проведения этого теста нужна хотябы одна версия python в python_storage'
     python_exe_version = python_versions[0]
     # скачивание пакетов для примера

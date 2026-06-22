@@ -1,9 +1,7 @@
-import sys
-import tempfile, shutil, uuid, tarfile
+import tempfile, shutil, uuid, tarfile, sys, subprocess
 import config
 from config import message_bus_add
 from pathlib import Path
-from functions import subprocess_wrapper
 from functions import python_fn
 from time import perf_counter
 
@@ -80,7 +78,7 @@ class PythonManager:
         # 3. Создание venv
         try:
             cmd = [str(python_exe_path), '-m', 'venv', venv_folder_name]
-            subprocess_wrapper.run(cmd, cwd=project_path, check=False)
+            subprocess.run(cmd, cwd=project_path, check=False, shell=False)
 
             message_bus_add(
                 subcomponent=SUBCOMPONENT,
@@ -170,7 +168,7 @@ class PythonManager:
                     python_path_exe, '-m', 'getpybs', '--python-version', python_version, '--dest',
                     temp_dir
                 ]
-                subprocess_wrapper.run(cmd, check=False, cwd=config.ROOT_DIR)
+                subprocess.run(cmd, check=False, cwd=config.ROOT_DIR, shell=False)
 
                 # 2. Сбор скачанных python файлов
                 for file in temp_path.rglob('*.gz'):

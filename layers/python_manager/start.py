@@ -1,6 +1,5 @@
-import shutil
+import shutil, subprocess
 import config
-from functions import subprocess_wrapper
 from layers.python_manager.main import PythonManager
 
 
@@ -30,7 +29,7 @@ def start(python_version: str = '3.12') -> None:
 
     # # 3. Установка getpybs для того чтобы можно было скачивать версии Python
     cmd = [config.PYTHON_EMBED_EXE, '-m', 'pip', 'install', '--no-warn-script-location', 'getpybs']
-    subprocess_wrapper.run(cmd, check=False, capture_output=True)
+    subprocess.run(cmd, check=False, capture_output=True, shell=False)
 
 
 if __name__ == '__main__':

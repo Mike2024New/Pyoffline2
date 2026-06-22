@@ -1,4 +1,4 @@
-import typer
+import typer, subprocess
 from rich import print
 import config
 from pathlib import Path
@@ -21,11 +21,19 @@ def main():
 
 
 @app.command()
+def version():
+    """Получение текущей версии"""
+    print(f'[cyan]PyOffline v1.0.0[/cyan]')
+
+
+@app.command()
 def show():
     """
-    Архив, доступных python версий и пакетов [yellow]show[/yellow]
+    Архив, доступных python версий и пакетов.
     Пример формата архива:
     {'python_storage': ['3.12', '3.14'], 'packages_storage': {'3.12': {'requests': ['2.34.2']}, '3.14': {'requests': ['2.34.2']}}}
+    Примеры команд:
+        [yellow]show[/yellow]
     """
     print(PackagesArchive.get_archive_packages_by_version())
 
@@ -33,12 +41,14 @@ def show():
 @app.command()
 def get(packages: list[str]):
     """
-    Скачать пакеты с PyPi.org
+    Скачать пакеты с PyPi.org (при наличии соединения с Pypi)
     (под капотом используется pip download)
-    Пример комманды: [yellow]get requests uvicorn[/yellow]
+    Примеры команд:
+        [yellow]get fastapi uvicorn[/yellow] - скачает последние версии указанных библиотек
+        [yellow]get python-dotenv==1.2.2[/yellow] - скачает конкретную версию пакета
+        [yellow]get passlib[bcrypt][/yellow] - скачает пакет + extras указанный в скобках
     """
     if len(packages) == 1:
-        # packages = packages[0].replace(',', ' ').split()
         packages = [p.strip().rstrip(',') for p in packages if p.strip()]
     try:
         PackagesArchive.download(packages_list=packages)
@@ -51,8 +61,9 @@ def get_from(
         file_name: str,
 ):
     """
-    Скачивание списка библиотек из файла, например из requirements.txt, поддерживаются комментарии вида #
-    Пример команды: [yellow]get-from ./reuirements.txt[/yellow]
+    Скачивание списка библиотек из файла, например из requirements.txt, поддерживаются комментарии вида
+    Примеры команд:
+        [yellow]get-from ./requirements.txt[/yellow]
     """
     file_name = Path(file_name)
     if not file_name.exists():
@@ -72,6 +83,21 @@ def get_from(
 
 
 @app.command()
+def update(
+        keep: int | None = typer.Option(None, '--keep', '-k')
+):
+    """
+    Получение latest версий (если они есть на PyPi) для всех пакетов всех версий python в архиве.
+    можно оставлять только заданное количество последних версий, чтобы архив не разрастался.
+    Опции:
+        -k (--keep) - оставлять только заданное количество последних версий, а более старые версии удалять.
+    Примеры команд:
+        [yellow]`update -k 1`[/yellow] - оставит только последнюю latest версию
+    """
+    PackagesArchive.update(keep=keep)
+
+
+@app.command()
 def add(
         pkg_list: list[str],
         project_path: Path | None = typer.Option(Path.cwd(), "--project-path", "-p", help="Путь к проекту"),
@@ -79,11 +105,12 @@ def add(
     """
     Установка пакета в целевой проект, создает toml если его нет в целевом проекте и добавляет в него пакет.
     Версия python пакета определяется автоматически.
-    Параметры:
+    Параметры (только в режиме разработчика, в обычном режиме указывать их не нужно):
         -p (--project-path) - путь к целевому проекту
         -pkg (--pkg-name) - название пакета, можно несколько через запятую
-    Пример команды:
-        [yellow]add fastapi, uvicorn -p ./app[/yellow]
+    Примеры команд:
+        [yellow]add fastapi, uvicorn[/yellow] - указать пакеты через пробел или через запятую
+        [yellow]add fastapi, uvicorn -p ./app[/yellow] - если другой проект то указать путь к нему через -p
     """
 
     if not config.EXE_MODE and project_path is None:
@@ -107,11 +134,9 @@ def remove(
     """
     Удаление пакетов из целевого проекта, удаляет пакет из toml проекта.
     Версия python пакета определяется автоматически.
-    Параметры:
-        -p (--project-path) - путь к целевому проекту
-        -pkg (--pkg-name) - название пакета, можно несколько через запятую
-    Пример команды:
-        [yellow]remove fastapi, uvicorn -p ./app[/yellow]
+    Примеры команд:
+        [yellow]remove fastapi, uvicorn[/yellow] - указать пакеты через пробел или через запятую
+        [yellow]remove fastapi, uvicorn -p ./app[/yellow] - если другой проект то указать путь к нему через -p
     """
 
     if not config.EXE_MODE and project_path is None:
@@ -134,11 +159,9 @@ def remove_all(
     """
     Удаление всех пакетов из целевого проекта, очищает toml проекта.
     Версия python пакета определяется автоматически.
-    Параметры:
-        -pkg (--pkg-name) - название пакета, можно несколько через запятую
-    Пример команды:
-        [yellow]add -p C:/Users/Projects/app --pkg fastapi[/yellow]
-        [yellow]remove-all -p ./app[/yellow]
+    Примеры команд:
+        [yellow]remove-all[/yellow] - удаление всех пакетов
+        [yellow]remove-all -p ./app[/yellow] - если другой проект то указать путь к нему через -p
     """
 
     if not config.EXE_MODE and project_path is None:
@@ -157,14 +180,13 @@ def init(
 ):
     """
     Создание проекта виртуального окружения (папка .venv в корне проекта).
-    Пример команды:
-        [yellow]init ./app -pv 3.12 -rp[/yellow]
-        (создать проект на python 3.12, заменив существующий)
-    Обязательные аргументы:
-        project_path целевая директория
     Опции:
         -pv (--python-version) версия python
         -rp (--replace-project) заменить venv в существующем проекте если есть.
+    Примеры команд:
+        [yellow]init -pv 3.12[/yellow] - создаст проект в текущей директории
+        [yellow]init -pv 3.12 -rp[/yellow] - пересоздаст проект в текущ директории (флаг -rp)
+        [yellow]init -p ./target-project -pv 3.12 -rp[/yellow] - создание проекта по указанному пути
     """
 
     if not config.EXE_MODE and project_path is None:
@@ -184,8 +206,10 @@ def init(
 def get_python(python_version: str):
     """
     Загрузка python с https://github.com/astral-sh/python-build-standalone/releases
-    Обязательный параметр python_version.
-    Пример команды: [yellow]get_python 3.12[/yellow]
+    Обязательные параметры:
+        python_version - желаемая версия python
+    Примеры команд:
+        [yellow]get_python 3.12[/yellow] - скачает портативную версию python-standalone 3.12
     """
     PythonManager.download_python(python_version=python_version)
 
@@ -207,6 +231,8 @@ if not config.EXE_MODE:
         Сборка exe (bin) приложения.
         Опции:
             -n (--name) - название приложения.
+        Примеры команд:
+            [yellow]build -n pyoff[/yellow] - создаст дистрибутив с названием pyoff
         """
         from build import start_build
         start_build(name=name)
@@ -217,12 +243,13 @@ if not config.EXE_MODE:
             v: bool = typer.Option(False, '-v', flag_value=True),
             s: bool = typer.Option(False, '-s', flag_value=True),
     ):
-        import subprocess
         """
         Запуск тестов.
         Опции:
             -v - подробный режим с путем к каждому модулю
-            -s - показывать принты внутри тестов 
+            -s - показывать принты внутри тестов
+        Примеры команд:
+            [yellow]run-tests -v -s[/yellow] - запуск тестов
         """
         cmd = ['pytest']
 

@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 import config
-from functions.subprocess_wrapper import run
+import subprocess
 
 
 # Получение exe путей, python доступных в архиве
@@ -44,7 +44,7 @@ def get_python_version(python_exe_path) -> str | None:
     """
     try:
         cmd = [python_exe_path, '--version']
-        answer = run(cmd, capture_output=True, text=True)
+        answer = subprocess.run(cmd, capture_output=True, text=True, shell=False)
     except Exception as err:
         raise RuntimeError(f'Не удалось получить версию python, ошибка: {err}')
 

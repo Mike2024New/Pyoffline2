@@ -108,9 +108,26 @@ def find_wheel(pkg_name: str, python_version) -> Path | None:
     return None
 
 
+def parse_package_name(pkg_name: str) -> tuple[str, None, str | None, list[str]]:
+    """
+
+    """
+    from packaging.requirements import Requirement
+    try:
+        pkg_data = Requirement(pkg_name)
+        name = pkg_data.name
+        version = pkg_data.specifier or None
+        extras = list(pkg_data.extras) or []
+        return str(name), None, str(version), extras
+    except Exception as err:
+        raise RuntimeError(f'Ошибка парсинга пакета {pkg_name}, текст ошибки: {err}')
+
+
 if __name__ == '__main__':
-    # print(extract_version_from_package_name(pkg_name='fastapi==0.136.3'))
     # print(get_archive_packages_by_version())
     # print(is_package_archive_exists(pkg_name='python-dotenv==1.2.2', python_version='3.14'))
     # print(find_wheel(pkg_name='fastapi==0.137.1', python_version='3.12'))
-    print(is_package_archive_exists(pkg_name='pydantic-settings', python_version='3.12'))
+    # print(is_package_archive_exists(pkg_name='pydantic-settings', python_version='3.12'))
+    # print(extract_version_from_package_name(pkg_name='fastapi==0.136.3'))
+    print(parse_package_name(pkg_name='passlib[argon2]'))
+    # print(new_extras(pkg_name='fastapi[standard,test]'))

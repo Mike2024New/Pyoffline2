@@ -1,7 +1,7 @@
+import subprocess
 import uuid
 import config
 from config import message_bus_add
-from functions import subprocess_wrapper
 from pathlib import Path
 from time import perf_counter
 from functions.toml_manager import TomlManager
@@ -36,8 +36,12 @@ class PackagesManager:
         :return: True/False
         """
         project_toml_deps = cls.get_packages_from_project(target_project_path)
-        pkg_name, _, _ = packages_fn.extract_version_from_package_name(pkg_name)
-        return any(pkg_name in dep for dep in project_toml_deps)
+        pkg_parse_name, _, _ = packages_fn.extract_version_from_package_name(pkg_name)
+        for dep in project_toml_deps:
+            dep_parse_name, _, _ = packages_fn.extract_version_from_package_name(pkg_name=dep)
+            if pkg_parse_name == dep_parse_name:
+                return True
+        return False
 
     @classmethod
     def install(cls, target_project_path: Path, pkg_name: str) -> None:
@@ -102,7 +106,7 @@ class PackagesManager:
         try:
             # 1. Нужно проверить, что пакет ещё не установлен
             cmd = [target_project_python_exe, '-m', 'pip', 'show', pkg_name]
-            subprocess_wrapper.run(cmd, cwd=target_project_path, capture_output=True, check=False)
+            subprocess.run(cmd, cwd=target_project_path, capture_output=True, check=False, shell=False)
             pkg_name = pkg_name.replace('-', '_')
 
             if not target_project_python_exe:
@@ -131,7 +135,7 @@ class PackagesManager:
                 '--find-links', wheel_file.parent,  # Искать здесь
                 pkg_name
             ]
-            subprocess_wrapper.run(cmd, check=False, capture_output=True)
+            subprocess.run(cmd, check=False, capture_output=True, shell=False)
 
             message_bus_add(
                 subcomponent=SUBCOMPONENT,
@@ -203,7 +207,7 @@ class PackagesManager:
                 name, _, _ = packages_fn.extract_version_from_package_name(pkg_name=pack)
                 name = name.replace('_', '-')
                 packages_names_list.append(name)
-            if deleted_pkg_name not in packages_names_list not in packages_names_list:
+            if deleted_pkg_name not in packages_names_list:
                 return
 
             deleted_packages_list = get_orphan_dependencies(
@@ -215,7 +219,7 @@ class PackagesManager:
             for remove_pack in deleted_packages_list:
                 cmd = [target_project_path / config.PYTHON_EXE_PATH_POSTFIX, '-m', 'pip', 'uninstall', '-y',
                        remove_pack]
-                subprocess_wrapper.run(cmd, cwd=target_project_path, check=False, capture_output=True)
+                subprocess.run(cmd, cwd=target_project_path, check=False, capture_output=True, shell=False)
 
             toml_manager.remove_dependency(pkg_name=deleted_pkg_name)
 
@@ -296,8 +300,7 @@ if __name__ == '__main__':
     # print(packgages_manager.get_packages_from_project(target_project_path=target_path))
 
     # # установка пакета в целевой проект + запись в pyproject.toml -> dependencies
-    packgages_manager.install(target_project_path=target_path, pkg_name='pydantic')
-
+    # packgages_manager.install(target_project_path=target_path, pkg_name='pydantic')
     # # удаление пакета из целевого проекта + удаление из pyproject.toml -> dependencies
     # packgages_manager.uninstall(target_project_path=target_path, pkg_name='fastapi')
     # # удаление всех пакетов из целевого проекта (очистка) + очистка  pyproject.toml -> dependencies

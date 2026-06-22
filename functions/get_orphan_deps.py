@@ -106,7 +106,7 @@ def get_orphan_dependencies(python_exe_path: Path, packages_list: list[str], del
 if __name__ == '__main__':
     res = get_orphan_dependencies(
         python_exe_path=Path(r'C:\Users\Projects\Desktop\app\.venv\Scripts\python.exe'),
-        deleted_package='fastapi',
-        packages_list=['pyaudio', 'print(123)'],  # инъекции убраны через sys.argv (123 не выполнится)
+        deleted_package='typer',
+        packages_list=['pydantic', 'typer'],  # инъекции убраны через sys.argv (123 не выполнится)
     )
     print(res)
