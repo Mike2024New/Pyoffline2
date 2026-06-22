@@ -4,6 +4,7 @@ import platform
 from pathlib import Path
 
 COMPONENT_ID = str(uuid.uuid4())[:8]
+VERSION = '0.1.0'
 
 
 def get_platform_name():

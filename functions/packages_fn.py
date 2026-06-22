@@ -130,4 +130,5 @@ if __name__ == '__main__':
     # print(is_package_archive_exists(pkg_name='pydantic-settings', python_version='3.12'))
     # print(extract_version_from_package_name(pkg_name='fastapi==0.136.3'))
     print(parse_package_name(pkg_name='passlib[argon2]'))
+    print(parse_package_name(pkg_name='wheel-filename==2.1.0'))
     # print(new_extras(pkg_name='fastapi[standard,test]'))

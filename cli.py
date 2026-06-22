@@ -23,7 +23,7 @@ def main():
 @app.command()
 def version():
     """Получение текущей версии"""
-    print(f'[cyan]PyOffline v1.0.0[/cyan]')
+    print(f'[cyan]PyOffline {config.VERSION}[/cyan]')
 
 
 @app.command()
@@ -48,8 +48,7 @@ def get(packages: list[str]):
         [yellow]get python-dotenv==1.2.2[/yellow] - скачает конкретную версию пакета
         [yellow]get passlib[bcrypt][/yellow] - скачает пакет + extras указанный в скобках
     """
-    if len(packages) == 1:
-        packages = [p.strip().rstrip(',') for p in packages if p.strip()]
+    packages = [p.strip().rstrip(',') for p in packages if p.strip()]
     try:
         PackagesArchive.download(packages_list=packages)
     except Exception:  # noqa
@@ -99,7 +98,7 @@ def update(
 
 @app.command()
 def add(
-        pkg_list: list[str],
+        packages: list[str],
         project_path: Path | None = typer.Option(Path.cwd(), "--project-path", "-p", help="Путь к проекту"),
 ):
     """
@@ -112,14 +111,9 @@ def add(
         [yellow]add fastapi, uvicorn[/yellow] - указать пакеты через пробел или через запятую
         [yellow]add fastapi, uvicorn -p ./app[/yellow] - если другой проект то указать путь к нему через -p
     """
-
-    if not config.EXE_MODE and project_path is None:
-        print(f'[yellow]Установка/удаление пакетов в режиме разработчика доступна через параметр -p[/yellow]')
-        return
-
-    project_path = project_path if project_path else Path.cwd()
-
-    for pkg in pkg_list:
+    project_path = project_path or Path.cwd()
+    packages = [p.strip().rstrip(',') for p in packages if p.strip()]
+    for pkg in packages:
         PackagesManager.install(
             target_project_path=Path(project_path),
             pkg_name=pkg,
@@ -128,7 +122,7 @@ def add(
 
 @app.command()
 def remove(
-        pkg_list: list[str],
+        packages: list[str],
         project_path: Path | None = typer.Option(None, "--project-path", "-p", help="Путь к проекту"),
 ):
     """
@@ -138,14 +132,9 @@ def remove(
         [yellow]remove fastapi, uvicorn[/yellow] - указать пакеты через пробел или через запятую
         [yellow]remove fastapi, uvicorn -p ./app[/yellow] - если другой проект то указать путь к нему через -p
     """
-
-    if not config.EXE_MODE and project_path is None:
-        print(f'[yellow]Установка/удаление пакетов в режиме разработчика доступна через параметр -p[/yellow]')
-        return
-
-    project_path = project_path if project_path else Path.cwd()
-    for pkg in pkg_list:
-        print(pkg)
+    project_path = project_path or Path.cwd()
+    packages = [p.strip().rstrip(',') for p in packages if p.strip()]
+    for pkg in packages:
         PackagesManager.uninstall(
             target_project_path=Path(project_path),
             pkg_name=pkg,
@@ -163,12 +152,7 @@ def remove_all(
         [yellow]remove-all[/yellow] - удаление всех пакетов
         [yellow]remove-all -p ./app[/yellow] - если другой проект то указать путь к нему через -p
     """
-
-    if not config.EXE_MODE and project_path is None:
-        print(f'[yellow]Установка/удаление пакетов в режиме разработчика доступна через параметр -p[/yellow]')
-        return
-
-    project_path = project_path if project_path else Path.cwd()
+    project_path = project_path or Path.cwd()
     PackagesManager.uninstall_all(target_project_path=Path(project_path))
 
 
@@ -188,18 +172,45 @@ def init(
         [yellow]init -pv 3.12 -rp[/yellow] - пересоздаст проект в текущ директории (флаг -rp)
         [yellow]init -p ./target-project -pv 3.12 -rp[/yellow] - создание проекта по указанному пути
     """
-
-    if not config.EXE_MODE and project_path is None:
-        print(f'[yellow]Установка/удаление пакетов в режиме разработчика доступна через параметр -p[/yellow]')
-        return
-
-    project_path = project_path if project_path else Path.cwd()
+    project_path = project_path or Path.cwd()
 
     PythonManager.create(
         project_path=Path(project_path),
         python_version=python_version,
         replace_project=replace_project,
     )
+
+
+@app.command()
+def sync(
+        project_path: Path | None = typer.Option(None, "--project-path", "-p", help="Путь к проекту"),
+):
+    """
+    Установка всех пакетов прописанных в pyproject.toml целевого проекта. Может быть полезно для стартовой инициализации
+    проекта, или редактирования .toml
+    Примеры команд:
+        [yellow]sync[/yellow] - синхронизация пакетов для текущей директории
+        [yellow]sync -p ./target-project[/yellow] - синхронизация пакетов для проекта по указанному пути
+    * метод в разработке пока не слишком оптимальный по времени выполнения.
+    """
+    project_path = project_path or Path.cwd()
+    PackagesManager.sync(target_project_path=project_path)
+
+
+@app.command()
+def project(
+        project_path: Path | None = typer.Option(None, "--project-path", "-p", help="Путь к проекту"),
+):
+    """
+    Получение информации о проекте (путь к интерпретатору, версия python, установленные пакеты)
+    Примеры команд:
+        [yellow]project[/yellow] - получение информации о проекте в текущей директории
+        [yellow]project -p ./target-project[/yellow] - получение информации о проекте по указанному пути
+    """
+    project_path = project_path or Path.cwd()
+
+    packages_project = PackagesManager.project_info(project_path)
+    print(packages_project)
 
 
 @app.command()

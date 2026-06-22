@@ -35,11 +35,16 @@ class PackagesManager:
         :param pkg_name: название проверяемого пакета
         :return: True/False
         """
-        project_toml_deps = cls.get_packages_from_project(target_project_path)
         pkg_parse_name, _, _ = packages_fn.extract_version_from_package_name(pkg_name)
-        for dep in project_toml_deps:
-            dep_parse_name, _, _ = packages_fn.extract_version_from_package_name(pkg_name=dep)
-            if pkg_parse_name == dep_parse_name:
+        target_project_python_exe = target_project_path / config.PYTHON_EXE_PATH_POSTFIX
+
+        cmd = [target_project_python_exe, '-m', 'pip', 'list']
+        res = subprocess.run(cmd, shell=False, text=True, capture_output=True, cwd=target_project_path)
+        pkg_base_name, _, _, _ = packages_fn.parse_package_name(pkg_name)
+        for row in res.stdout.splitlines():
+            row = row.split(' ')
+            pip_list_package, pkg_version = row[0], row[1]
+            if pkg_base_name == pip_list_package:
                 return True
         return False
 
@@ -56,19 +61,6 @@ class PackagesManager:
 
         request_id = str(uuid.uuid4())[:8]
         start_time = perf_counter()
-
-        if cls._is_package_installed(
-                target_project_path=target_project_path,
-                pkg_name=pkg_name,
-        ):
-            message_bus_add(
-                event='packgage already exists in target project',
-                message=f'Пакет {pkg_name} уже установлен в целевом проекте',
-                subcomponent=SUBCOMPONENT,
-                level='warning',
-                request_id=request_id,
-            )
-            return
 
         message_bus_add(
             subcomponent=SUBCOMPONENT,
@@ -176,13 +168,6 @@ class PackagesManager:
                 target_project_path=target_project_path,
                 pkg_name=pkg_name,
         ):
-            message_bus_add(
-                event='packgage not found in target project',
-                message=f'Пакет {pkg_name} отсутствует в целевом проекте',
-                subcomponent=SUBCOMPONENT,
-                level='warning',
-                request_id=request_id,
-            )
             return
 
         message_bus_add(
@@ -292,12 +277,51 @@ class PackagesManager:
             )
             raise RuntimeError(f'Не удалось очистить пакеты в `{target_project_path}`, причина: {err}')
 
+    @classmethod
+    def sync(cls, target_project_path: Path) -> None:
+        """
+        Установка/переустановка пакетов в проект на основании pyproject.toml
+        :param target_project_path: целевой проект
+        :return: None
+        """
+        # получение всех пакетов
+        toml_manager = get_toml_manager(target_project_path=target_project_path)
+        packages = toml_manager.list_dependencies()
+        cls.uninstall_all(target_project_path=target_project_path)
+
+        for pack in packages:
+            cls.install(
+                target_project_path=target_project_path,
+                pkg_name=pack
+            )
+
+    @classmethod
+    def project_info(cls, target_project_path: Path) -> dict:
+        """Общая информация о проекте"""
+        depends = cls.get_packages_from_project(target_project_path)
+        depends = [
+            dep for dep in depends if cls._is_package_installed(
+                target_project_path=target_project_path,
+                pkg_name=dep)
+        ]
+        target_project_python_exe = target_project_path / config.PYTHON_EXE_PATH_POSTFIX
+        python_version = python_fn.get_python_version(target_project_python_exe)
+        return {
+            'project_dir': str(target_project_path.as_posix()),
+            'project_interpreter': str(target_project_python_exe.as_posix()),
+            'python_version': python_version,
+            'depends': depends,
+        }
+
 
 if __name__ == '__main__':
     packgages_manager = PackagesManager()
     target_path = Path(r'C:\Users\Projects\Desktop\app')
-    # получение всех пакетов установленных в проект (pyproject.toml -> dependencies)
-    # print(packgages_manager.get_packages_from_project(target_project_path=target_path))
+    # packgages_manager.install(target_project_path=target_path, pkg_name='fastapi')
+    # packgages_manager.install(target_project_path=target_path, pkg_name='pydantic')
+    # packgages_manager.uninstall(target_project_path=target_path, pkg_name='fastapi')
+    # packgages_manager.uninstall(target_project_path=target_path, pkg_name='pydantic')
+    packgages_manager.uninstall_all(target_project_path=target_path)
 
     # # установка пакета в целевой проект + запись в pyproject.toml -> dependencies
     # packgages_manager.install(target_project_path=target_path, pkg_name='pydantic')
