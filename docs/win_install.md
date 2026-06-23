@@ -1,0 +1,1 @@
+![описание GIF](assets/installing.gif)

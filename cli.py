@@ -220,7 +220,7 @@ def get_python(python_version: str):
     Обязательные параметры:
         python_version - желаемая версия python
     Примеры команд:
-        [yellow]get_python 3.12[/yellow] - скачает портативную версию python-standalone 3.12
+        [yellow]get-python 3.12[/yellow] - скачает портативную версию python-standalone 3.12
     """
     PythonManager.download_python(python_version=python_version)
 
