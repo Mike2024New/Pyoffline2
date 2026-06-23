@@ -1,0 +1,1 @@
+![описание GIF](assets/linux_variable_path.gif)
