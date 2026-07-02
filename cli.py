@@ -266,7 +266,12 @@ def tree(
         copy_text = ""
         copy_text += "\n".join([i for i in tree_list])
         copy_text += "\n".join([i for i in content_list])
-        pyperclip.copy(copy_text)
+        try:
+            pyperclip.copy(copy_text)
+        except Exception as err:
+            print(f'[red]Ошибка копирования текста: {err}[/red]')
+            return
+
         print('[green]Скопировано в буфер обмена.[/green]')
 
 
@@ -331,3 +336,4 @@ if not config.EXE_MODE:
 
 if __name__ == '__main__':
     app()
+
