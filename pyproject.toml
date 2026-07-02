@@ -1,6 +1,6 @@
 [project]
 name = "pyoffline2"
-version = "0.1.0"
+version = "0.2.0"
 description = "Packages "
 readme = "README.md"
 requires-python = ">=3.12"
@@ -15,6 +15,7 @@ dependencies = [
     "jinja2>=3.1.6",
     "pytest>=9.1.0",
     "infrastructure",
+    "pyperclip>=1.11.0",
 ]
 
 [tool.pytest.ini_options]
@@ -31,5 +32,5 @@ pythonpath = [
 ]
 markers = []
 
-[tool.uv.sources.infrastructure]
-git = "https://github.com/Mike2024New/infrastructure.git"
+[tool.uv.sources]
+infrastructure = { git = "https://github.com/Mike2024New/infrastructure.git" }

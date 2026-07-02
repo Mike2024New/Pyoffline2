@@ -5,6 +5,7 @@ release/
 python_embed/
 python/
 logs/
+tree_cfg/
 
 # тесты
 .pytest_cache/

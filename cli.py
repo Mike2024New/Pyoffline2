@@ -1,3 +1,4 @@
+import pyperclip
 import typer, subprocess
 from rich import print
 import config
@@ -230,6 +231,57 @@ def folder():
     """Открыть домашнюю папку приложения"""
     from infrastructure.path_utils.open_folder import open_folder
     open_folder(config.ROOT_DIR)
+
+
+@app.command()
+def tree(
+        project_path: Path | None = typer.Option(Path.cwd(), "--project-path", "-p", help="Путь к проекту"),
+        show_tree: bool = typer.Option(False, "--show-tree", "-st", is_flag=True),
+        show_content: bool = typer.Option(False, "--show-content", "-sc", is_flag=True),
+        copy_buffer: bool = typer.Option(False, "--copy-buffer", "-cb", is_flag=True),
+):
+    """
+    Показать дерево и контент по текущему пути или по указанному.
+    Опции:
+        -p  (--project-path) - путь к целевому каталогу
+        -st (--show-tree) - показывать дерево целевого каталога
+        -sc (--show-content) - показать контент (содержимое файлов)
+        -cb (--copy-buffer) - копировать в буфер (например для чата с ИИ)
+    Примеры команд:
+        [yellow]tree -st[/yellow]  -  показать дерево каталога
+        [yellow]tree -sc[/yellow]  -  показать контент (содержимое файлов)
+        [yellow]tree -st -sc[/yellow]  -  показать и дерево контента и содержимое файлов
+    """
+    from layers.directory_walker.main import show_tree_catalog
+    if not show_tree and not show_content and not copy_buffer:
+        print(f'[yellow]Не выбрано ни одной опции для демонстрации дерева, укажите -st и/или -sc и/или -cp[/yellow]')
+        return
+    path = project_path or config.ROOT_DIR
+    tree_list, content_list = show_tree_catalog(root_dir=path)
+    if show_tree:
+        [print(t) for t in tree_list]
+    if show_content:
+        [print(c) for c in content_list]
+    if copy_buffer:
+        copy_text = ""
+        copy_text += "\n".join([i for i in tree_list])
+        copy_text += "\n".join([i for i in content_list])
+        pyperclip.copy(copy_text)
+        print('[green]Скопировано в буфер обмена.[/green]')
+
+
+@app.command()
+def tree_cfg():
+    """
+    Открыть папку с настройками tree (иконки, исключаемые файлы и папки).
+    [yellow]hidden.json[/yellow] - в исключаемых файлах и папках можно указывать *, например:
+        "http_*", # скроет все папки которые начинаются на http_
+        "*_http", # скроет все папки которые заканчиваются на _http
+        "*_http_*", # скроет все папки которые содержат _http_
+    [yellow]icons.json[/yellow]В иконках можно указывать эмодзи для обозначения файлов и папок.
+    """
+    from infrastructure.path_utils.open_folder import open_folder
+    open_folder(config.TREE_HIDDEN_CONFIG.parent)
 
 
 # доступно только в режиме разработки

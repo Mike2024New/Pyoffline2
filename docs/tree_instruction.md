@@ -1,0 +1,1 @@
+![описание GIF](assets/tree_instruction.gif)

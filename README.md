@@ -13,6 +13,7 @@
 - [Быстрый старт](#-быстрый-старт)
 - [Команды](#-команды)
 - [Где хранить архив](#-где-хранить-архив)
+- [История развития проекта](#-история-развития-проекта)
 - [Лицензия](#-лицензия)
 - [Примечания](#примечания)
 
@@ -181,6 +182,8 @@ pyoffline даёт простой ответ: **один раз скачал —
   больше не используется ни одним другим пакетом
 - 📖 **Вести структурированный (машиночитаемый) лог** о выполненных операциях корневая папка logs команда `folder`, чтобы
   открыть корневую папку приложения.
+- 📂 **Выводить дерево проекта и копировать контент** в буфер обмена. Удобно для обзора проекта, и для чата с
+  ИИ. [Смотреть анимацию](docs/tree_instruction.md)
 
 ---
 
@@ -246,6 +249,7 @@ pyoff remove fastapi # Удаление fastapi с очисткой "сирот"
 pyoff project # посмотреть информацию о проекте
 pip list # проверка что fastapi удалился корректно, но pydantic не пострадал
 pyoff remove-all # удаление всех пакетов проекта
+pyoff tree -st # вывести дерево проекта в терминал (для копирования в буфер укажите флаг -cb)
 ```
 
 - [Смотреть анимацию](docs/win_use_case.md)
@@ -309,6 +313,8 @@ pyoff remove fastapi # Удаление fastapi с очисткой "сирот"
 pyoff project # посмотреть информацию о проекте
 pip list # проверка что fastapi удалился корректно, но pydantic не пострадал
 pyoff remove-all # удаление всех пакетов проекта
+pyoff tree -st # вывести дерево проекта в терминал (для копирования в буфер укажите флаг -cb)
+pyoff tree-cfg # открыть папку с файлами конфигурации где в `hidden.json` можно указать пропускаемые папки и файлы с учётом частичного включения '*'
 ```
 
 - [Смотреть анимацию](docs/linux_use_case.md)
@@ -334,6 +340,10 @@ pyoff remove-all # удаление всех пакетов проекта
 - `folder` — открыть папку приложения
 - `run-tests` — запустить тесты *(только из кода, до сборки)*
 - `build` — собрать исполняемый файл *(только из кода, до сборки)*
+- `tree`  — вывести дерево проекта в терминал, (добавить флаги -sc - показать контент, или -cb копировать в буфер
+  обмена)
+- `tree-cfg` — открыть папку с файлами конфигурации где в `hidden.json` можно указать пропускаемые папки и файлы с
+  учётом частичного включения '*'
 
 ---
 
@@ -346,6 +356,189 @@ pyoff remove-all # удаление всех пакетов проекта
 - Облачный диск (всё равно не понадобится интернет для установки, только для пополнения)
 
 **Никаких настроек серверов, баз данных и Docker-контейнеров.**
+
+---
+
+## 📝 История развития проекта
+
+<details>
+  <summary>02.07.2026 - v0.2.0</summary>
+
+- Добавлена команда вывода дерева проекта и контента в консоль и копирования в буфер
+  обмена [Смотреть анимацию](docs/tree_instruction.md). Пример дерева (этого проекта):
+
+<details>
+```text
+📁 PyOffline2
+├─ 📁 .git [содержимое скрыто]
+├─ 📁 .idea [содержимое скрыто]
+├─ 📁 .pytest_cache [содержимое скрыто]
+├─ 📁 .venv [содержимое скрыто]
+├─ 📁 __pycache__ [содержимое скрыто]
+├─ 📁 config
+│   ├─ 📁 __pycache__ [содержимое скрыто]
+│   ├─ 🐍 __init__.py
+│   └─ 🐍 schemas.py
+├─ 📁 docs
+│   ├─ 📁 assets
+│   │   ├─ 🖼️ installing.gif
+│   │   ├─ 🖼️ linux_installing.gif
+│   │   ├─ 🖼️ linux_use_case.gif
+│   │   ├─ 🖼️ linux_variable_path.gif
+│   │   ├─ 🖼️ path_variables.gif
+│   │   └─ 🖼️ use_case.gif
+│   ├─ 📝 habr_public.md
+│   ├─ 📝 linux_install.md
+│   ├─ 📝 linux_use_case.md
+│   ├─ 📝 linux_variable_path.md
+│   ├─ 📝 win_install.md
+│   ├─ 📝 win_use_case.md
+│   └─ 📝 win_variable_path.md
+├─ 📁 functions
+│   ├─ 📁 __pycache__ [содержимое скрыто]
+│   ├─ 🐍 __init__.py
+│   ├─ 🐍 get_orphan_deps.py
+│   ├─ 🐍 packages_fn.py
+│   ├─ 🐍 python_fn.py
+│   └─ 🐍 toml_manager.py
+├─ 📁 layers
+│   ├─ 📁 __pycache__ [содержимое скрыто]
+│   ├─ 📁 archive_manager
+│   │   ├─ 📁 __pycache__ [содержимое скрыто]
+│   │   ├─ 🐍 __init__.py
+│   │   ├─ 🐍 helper.py
+│   │   └─ 🐍 main.py
+│   ├─ 📁 directory_walker
+│   │   ├─ 📁 __pycache__ [содержимое скрыто]
+│   │   ├─ 🐍 __init__.py
+│   │   └─ 🐍 main.py
+│   ├─ 📁 pack_installer
+│   │   ├─ 📁 __pycache__ [содержимое скрыто]
+│   │   ├─ 🐍 __init__.py
+│   │   └─ 🐍 main.py
+│   ├─ 📁 python_manager
+│   │   ├─ 📁 __pycache__ [содержимое скрыто]
+│   │   ├─ 🐍 __init__.py
+│   │   ├─ 🐍 main.py
+│   │   └─ 🐍 start.py
+│   └─ 🐍 __init__.py
+├─ 📁 logs [содержимое скрыто]
+├─ 📁 python_embed [содержимое скрыто]
+├─ 📁 releases [содержимое скрыто]
+├─ 📁 resources
+│   ├─ 📁 packages_storage
+│   │   └─ 📁 windows-x86_64
+│   │       ├─ 📁 3.10
+│   │       │   ├─ 📁 fastapi==0.139.0
+│   │       │   │   ├─ 📄 annotated_doc-0.0.4-py3-none-any.whl
+│   │       │   │   ├─ 📄 annotated_types-0.7.0-py3-none-any.whl
+│   │       │   │   ├─ 📄 anyio-4.14.1-py3-none-any.whl
+│   │       │   │   ├─ 📄 exceptiongroup-1.3.1-py3-none-any.whl
+│   │       │   │   ├─ 📄 fastapi-0.139.0-py3-none-any.whl
+│   │       │   │   ├─ 📄 idna-3.18-py3-none-any.whl
+│   │       │   │   ├─ 📄 pydantic-2.13.4-py3-none-any.whl
+│   │       │   │   ├─ 📄 pydantic_core-2.46.4-cp310-cp310-win_amd64.whl
+│   │       │   │   ├─ 📄 starlette-1.3.1-py3-none-any.whl
+│   │       │   │   ├─ 📄 typing_extensions-4.16.0-py3-none-any.whl
+│   │       │   │   └─ 📄 typing_inspection-0.4.2-py3-none-any.whl
+│   │       │   ├─ 📁 python_dotenv==1.2.2
+│   │       │   │   └─ 📄 python_dotenv-1.2.2-py3-none-any.whl
+│   │       │   ├─ 📁 requests==2.34.2
+│   │       │   │   ├─ 📄 certifi-2026.6.17-py3-none-any.whl
+│   │       │   │   ├─ 📄 charset_normalizer-3.4.7-cp310-cp310-win_amd64.whl
+│   │       │   │   ├─ 📄 idna-3.18-py3-none-any.whl
+│   │       │   │   ├─ 📄 requests-2.34.2-py3-none-any.whl
+│   │       │   │   └─ 📄 urllib3-2.7.0-py3-none-any.whl
+│   │       │   └─ 📁 uvicorn==0.49.0
+│   │       │       ├─ 📄 click-8.4.2-py3-none-any.whl
+│   │       │       ├─ 📄 colorama-0.4.6-py2.py3-none-any.whl
+│   │       │       ├─ 📄 h11-0.16.0-py3-none-any.whl
+│   │       │       ├─ 📄 typing_extensions-4.16.0-py3-none-any.whl
+│   │       │       └─ 📄 uvicorn-0.49.0-py3-none-any.whl
+│   │       ├─ 📁 3.12
+│   │       │   ├─ 📁 fastapi==0.139.0
+│   │       │   │   ├─ 📄 annotated_doc-0.0.4-py3-none-any.whl
+│   │       │   │   ├─ 📄 annotated_types-0.7.0-py3-none-any.whl
+│   │       │   │   ├─ 📄 anyio-4.14.1-py3-none-any.whl
+│   │       │   │   ├─ 📄 fastapi-0.139.0-py3-none-any.whl
+│   │       │   │   ├─ 📄 idna-3.18-py3-none-any.whl
+│   │       │   │   ├─ 📄 pydantic-2.13.4-py3-none-any.whl
+│   │       │   │   ├─ 📄 pydantic_core-2.46.4-cp312-cp312-win_amd64.whl
+│   │       │   │   ├─ 📄 starlette-1.3.1-py3-none-any.whl
+│   │       │   │   ├─ 📄 typing_extensions-4.16.0-py3-none-any.whl
+│   │       │   │   └─ 📄 typing_inspection-0.4.2-py3-none-any.whl
+│   │       │   ├─ 📁 python_dotenv==1.2.2
+│   │       │   │   └─ 📄 python_dotenv-1.2.2-py3-none-any.whl
+│   │       │   ├─ 📁 requests==2.34.2
+│   │       │   │   ├─ 📄 certifi-2026.6.17-py3-none-any.whl
+│   │       │   │   ├─ 📄 charset_normalizer-3.4.7-cp312-cp312-win_amd64.whl
+│   │       │   │   ├─ 📄 idna-3.18-py3-none-any.whl
+│   │       │   │   ├─ 📄 requests-2.34.2-py3-none-any.whl
+│   │       │   │   └─ 📄 urllib3-2.7.0-py3-none-any.whl
+│   │       │   └─ 📁 uvicorn==0.49.0
+│   │       │       ├─ 📄 click-8.4.2-py3-none-any.whl
+│   │       │       ├─ 📄 colorama-0.4.6-py2.py3-none-any.whl
+│   │       │       ├─ 📄 h11-0.16.0-py3-none-any.whl
+│   │       │       └─ 📄 uvicorn-0.49.0-py3-none-any.whl
+│   │       └─ 📁 3.14
+│   │           ├─ 📁 fastapi==0.139.0
+│   │           │   ├─ 📄 annotated_doc-0.0.4-py3-none-any.whl
+│   │           │   ├─ 📄 annotated_types-0.7.0-py3-none-any.whl
+│   │           │   ├─ 📄 anyio-4.14.1-py3-none-any.whl
+│   │           │   ├─ 📄 fastapi-0.139.0-py3-none-any.whl
+│   │           │   ├─ 📄 idna-3.18-py3-none-any.whl
+│   │           │   ├─ 📄 pydantic-2.13.4-py3-none-any.whl
+│   │           │   ├─ 📄 pydantic_core-2.46.4-cp314-cp314-win_amd64.whl
+│   │           │   ├─ 📄 starlette-1.3.1-py3-none-any.whl
+│   │           │   ├─ 📄 typing_extensions-4.16.0-py3-none-any.whl
+│   │           │   └─ 📄 typing_inspection-0.4.2-py3-none-any.whl
+│   │           ├─ 📁 python_dotenv==1.2.2
+│   │           │   └─ 📄 python_dotenv-1.2.2-py3-none-any.whl
+│   │           ├─ 📁 requests==2.34.2
+│   │           │   ├─ 📄 certifi-2026.6.17-py3-none-any.whl
+│   │           │   ├─ 📄 charset_normalizer-3.4.7-cp314-cp314-win_amd64.whl
+│   │           │   ├─ 📄 idna-3.18-py3-none-any.whl
+│   │           │   ├─ 📄 requests-2.34.2-py3-none-any.whl
+│   │           │   └─ 📄 urllib3-2.7.0-py3-none-any.whl
+│   │           └─ 📁 uvicorn==0.49.0
+│   │               ├─ 📄 click-8.4.2-py3-none-any.whl
+│   │               ├─ 📄 colorama-0.4.6-py2.py3-none-any.whl
+│   │               ├─ 📄 h11-0.16.0-py3-none-any.whl
+│   │               └─ 📄 uvicorn-0.49.0-py3-none-any.whl
+│   └─ 📁 python_storage
+│       └─ 📁 windows-x86_64
+│           ├─ 📁 3.10
+│           │   └─ 📁 python [содержимое скрыто]
+│           ├─ 📁 3.12
+│           │   └─ 📁 python [содержимое скрыто]
+│           └─ 📁 3.14
+│               └─ 📁 python [содержимое скрыто]
+├─ 📁 tests
+│   ├─ 📁 __pycache__ [содержимое скрыто]
+│   ├─ 🐍 test_archive_packages.py
+│   ├─ 🐍 test_init_project.py
+│   └─ 🐍 test_python.py
+├─ 📁 tree_cfg
+│   ├─ 📄 hidden.json
+│   └─ 📄 icons.json
+├─ 🔒 .gitignore
+├─ 📄 .python-version
+├─ 🐍 build.py
+├─ 🐍 cli.py
+├─ 🐍 helper.py
+├─ 📄 LICENSE
+├─ 📄 pyproject.toml
+├─ 📝 README.md
+├─ 🐍 start.py
+└─ 📄 todo.txt
+```
+</details>
+
+
+</details>
+
+---
+
 
 ---
 

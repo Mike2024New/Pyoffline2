@@ -4,7 +4,7 @@ import platform
 from pathlib import Path
 
 COMPONENT_ID = str(uuid.uuid4())[:8]
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 
 
 def get_platform_name():
@@ -23,6 +23,7 @@ __all__ = [
     'message_bus_add',
     'IS_WINDOWS', 'COMPONENT_ID',
     'ROOT_DIR',
+    'TREE_ICONS_CONFIG', 'TREE_HIDDEN_CONFIG',  # утилита по отображению дерева проекта
 ]
 
 IS_WINDOWS = 'windows' in platform.system().lower()
@@ -84,3 +85,8 @@ message_bus_add = message_bus_factory(
         rotation_disable=False,
     )
 )
+
+# конфигурация для рисовальщика деревьев
+(ROOT_DIR / 'tree_cfg').mkdir(exist_ok=True, parents=True)
+TREE_ICONS_CONFIG = ROOT_DIR / 'tree_cfg' / 'icons.json'
+TREE_HIDDEN_CONFIG = ROOT_DIR / 'tree_cfg' / 'hidden.json'
